@@ -7,34 +7,34 @@ So after I overheard one of my colleagues complaining about this as well,
 I quickly hacked together a Python version that basically does the same.
 ## Usage
 ```
-$ python2 ./pattern.py
-Usage: pattern.py (create | offset) <value> <buflen>
+$ ./pattern
+Usage: pattern (create | offset) <value> <buflen>
 ```
 So, to create a 2048 byte pattern you run
 ```
-$ python2 pattern.py create 2048
+$ ./pattern create 2048
 Aa0Aa1Aa2[...snip...]p7Cp8Cp9Cq0Cq1Cq
 ```
 and it outputs a unique pattern of said length. To find an offset in the
 buffer, let's say f9Cg, you run
 ```
-$ python2 pattern.py offset f9Cg
+$ ./pattern offset f9Cg
 1738
 ```
 and the program returns the offset until the requested series. You can also
 look for memory values. The values need to be little-endian and prefixed
 with 0x:
 ```
-$ python2 pattern.py offset 0x67433966
+$ ./pattern offset 0x67433966
 1738
 ```
 To make sure the program works as close to the Metasploit version as possible,
 the offset mode searches through a 8192 byte pattern, just like pattern_offset.
 If your pattern is longer than that, append the pattern length:
 ```
-$ python2 pattern.py offset 9Mc0
+$ ./pattern offset 9Mc0
 Not found
-$ python2 pattern.py offset 9Mc0 10000
+$ ./pattern offset 9Mc0 10000
 9419
 ```
 ## Todo
