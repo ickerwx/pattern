@@ -2,9 +2,20 @@
 import sys
 import struct
 
-def pattern_create(length):
+def print_help():
+    print 'Usage: %s (create | offset) <value> <buflen>' % sys.argv[0]
+
+def pattern_create(length = 8192):
     pattern = ''
     parts = ['A', 'a', '0']
+    try:
+        if not isinstance(length, (int, long)) and length.startswith('0x'):
+            length = int(length, 16)
+        elif not isinstance(length, (int, long)):
+            length = int(length, 10)
+    except ValueError:
+        print_help()
+        sys.exit(254)
     while len(pattern) != length:
         pattern += parts[len(pattern) % 3]
         if len(pattern) % 3 == 0:
@@ -19,19 +30,18 @@ def pattern_create(length):
                         parts[0] = 'A'
     return pattern
 
-def pattern_offset(value, buflen):
-    if value.startswith('0x'):
-        value = struct.pack('<I', int(value, 16)).strip('\x00')
-    pattern = pattern_create(buflen)
+def pattern_offset(value, length = 8192):
+    try:
+        if not isinstance(value, (int, long)) and value.startswith('0x'):
+            value = struct.pack('<I', int(value, 16)).strip('\x00')
+    except ValueError:
+        print_help()
+        sys.exit(254)
+    pattern = pattern_create(length)
     try:
         return pattern.index(value)
     except ValueError:
         return 'Not found'
-
-
-def print_help():
-    print 'Usage: %s (create | offset) <value> <buflen>' % sys.argv[0]
-
 
 def main():
     if len(sys.argv) < 3 or sys.argv[1].lower() not in ['create', 'offset']:
@@ -42,17 +52,9 @@ def main():
     num_value = sys.argv[2]
 
     if command == 'create':
-        print pattern_create(int(num_value, 16 if num_value.startswith('0x') else 10))
-    else:
-        if len(sys.argv) == 4:
-            try:
-                buflen = int(sys.argv[3], 16 if sys.argv[3].startswith('0x') else 10)
-            except ValueError:
-                print_help()
-                sys.exit(254)
-        else:
-            buflen = 8192
-        print pattern_offset(num_value, buflen)
+        print pattern_create(num_value)
+    elif len(sys.argv) == 4:
+        print pattern_offset(num_value, sys.argv[3])  
 
 if __name__ == '__main__':
     main()
